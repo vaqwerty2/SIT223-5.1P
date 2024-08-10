@@ -29,6 +29,14 @@ pipeline {
                 echo 'Using a basic tool like OWASP Dependency Check to identify vulnerabilities.'
                 // Example: sh 'dependency-check --project MyApp --scan .'
             }
+            post {
+                success {
+                    echo 'Security scan passed successfully!'
+                    mail to: 'vidulattri2003@gmail.com',
+                         subject: "Security Scan Passed - Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                         body: "The security scan in pipeline ${env.JOB_NAME} completed successfully.\n\nCheck the results here: ${env.BUILD_URL}"
+                }
+            }
         }
         stage('Deploy to Staging') {
             steps {
