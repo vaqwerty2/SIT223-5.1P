@@ -71,7 +71,7 @@ pipeline {
                  body: "The pipeline ${env.JOB_NAME} completed successfully.\n\nCheck the results here: ${env.BUILD_URL}"
         }
         failure {
-            echo 'Pipeline failed.'
+            echo 'Pipeline failed!'
             mail to: 'vidulattri2003@gmail.com',
                  subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                  body: "The pipeline ${env.JOB_NAME} has failed.\n\nCheck the details here: ${env.BUILD_URL}"
