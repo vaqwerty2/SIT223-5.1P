@@ -9,13 +9,7 @@ pipeline {
                 // Example: sh 'mvn clean package'
             }
         }
-        stage('Unit and Integration Tests') {
-            steps {
-                echo 'Running Unit and Integration Tests...'
-                echo 'Using a test automation tool like JUnit for unit tests and TestNG for integration tests.'
-                // Example: sh 'mvn test'
-            }
-        }
+        
         stage('Code Analysis') {
             steps {
                 echo 'Performing Code Analysis...'
