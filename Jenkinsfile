@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        COMMIT_MESSAGE = '' 
+        COMMIT_MESSAGE = '' // This is the variable where commit message is stored
     }
 
     stages {
