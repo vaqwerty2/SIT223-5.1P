@@ -2,16 +2,18 @@ pipeline {
     agent any
 
     environment {
-        COMMIT_MESSAGE = '' // Define a variable to store the commit message
+        COMMIT_MESSAGE = '' // Initialize the variable to store the commit message
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
                 script {
+                    // Ensure SCM checkout and then fetch the latest commit message
+                    def scmVars = checkout scm
                     // Fetch the latest commit message
                     COMMIT_MESSAGE = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                    echo "Commit Message: ${COMMIT_MESSAGE}"
                 }
             }
         }
@@ -52,7 +54,7 @@ pipeline {
 Check the results here: ${env.BUILD_URL}
 
 Commit Message:
-${env.COMMIT_MESSAGE}"""
+${COMMIT_MESSAGE}"""
                 }
             }
         }
@@ -91,7 +93,7 @@ ${env.COMMIT_MESSAGE}"""
 Check the results here: ${env.BUILD_URL}
 
 Commit Message:
-${env.COMMIT_MESSAGE}"""
+${COMMIT_MESSAGE}"""
         }
         failure {
             echo 'Pipeline failed!'
@@ -102,7 +104,7 @@ ${env.COMMIT_MESSAGE}"""
 Check the details here: ${env.BUILD_URL}
 
 Commit Message:
-${env.COMMIT_MESSAGE}"""
+${COMMIT_MESSAGE}"""
         }
     }
 }
