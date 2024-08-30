@@ -1,7 +1,20 @@
 pipeline {
     agent any
 
+    environment {
+        COMMIT_MESSAGE = '' // Define a variable to store the commit message
+    }
+
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    // Fetch the latest commit message
+                    COMMIT_MESSAGE = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                }
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building the application...'
@@ -34,7 +47,12 @@ pipeline {
                     echo 'Security scan passed successfully!'
                     mail to: 'vidulattri2003@gmail.com',
                          subject: "Security Scan Passed - Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
-                         body: "The security scan in pipeline ${env.JOB_NAME} completed successfully.\n\nCheck the results here: ${env.BUILD_URL}"
+                         body: """The security scan in pipeline ${env.JOB_NAME} completed successfully.
+
+Check the results here: ${env.BUILD_URL}
+
+Commit Message:
+${env.COMMIT_MESSAGE}"""
                 }
             }
         }
@@ -68,13 +86,23 @@ pipeline {
             echo 'Pipeline completed successfully!'
             mail to: 'vidulattri2003@gmail.com',
                  subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
-                 body: "The pipeline ${env.JOB_NAME} completed successfully.\n\nCheck the results here: ${env.BUILD_URL}"
+                 body: """The pipeline ${env.JOB_NAME} completed successfully.
+
+Check the results here: ${env.BUILD_URL}
+
+Commit Message:
+${env.COMMIT_MESSAGE}"""
         }
         failure {
             echo 'Pipeline failed!'
             mail to: 'vidulattri2003@gmail.com',
                  subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
-                 body: "The pipeline ${env.JOB_NAME} has failed.\n\nCheck the details here: ${env.BUILD_URL}"
+                 body: """The pipeline ${env.JOB_NAME} has failed.
+
+Check the details here: ${env.BUILD_URL}
+
+Commit Message:
+${env.COMMIT_MESSAGE}"""
         }
     }
 }
