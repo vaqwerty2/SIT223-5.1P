@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     environment {
-        COMMIT_MESSAGE = '' // This is the variable where commit message is stored
+        COMMIT_MESSAGE = '' // Initialize the variable to store the commit message
     }
 
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    
+                    // Ensure SCM checkout and then fetch the latest commit message
                     def scmVars = checkout scm
                     // Fetch the latest commit message
                     COMMIT_MESSAGE = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
