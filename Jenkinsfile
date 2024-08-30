@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Ensure SCM checkout and then fetch the latest commit message
+                    
                     def scmVars = checkout scm
                     // Fetch the latest commit message
                     COMMIT_MESSAGE = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
