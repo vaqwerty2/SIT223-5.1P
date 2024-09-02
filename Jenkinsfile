@@ -67,6 +67,7 @@ pipeline {
                         def log = "Security scan passed successfully!\n"
                         writeFile file: "${LOG_FILE}", text: log, append: true
                         echo log
+                        archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
                         mail to: 'vidulattri2003@gmail.com',
                              subject: "Security Scan Passed - Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
                              body: """The security scan in pipeline ${env.JOB_NAME} completed successfully.
@@ -83,6 +84,7 @@ ${COMMIT_MESSAGE}""",
                         def log = "Security scan failed!\n"
                         writeFile file: "${LOG_FILE}", text: log, append: true
                         echo log
+                        archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
                         mail to: 'vidulattri2003@gmail.com',
                              subject: "Security Scan Failed - Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
                              body: """The security scan in pipeline ${env.JOB_NAME} has failed.
@@ -139,6 +141,7 @@ ${COMMIT_MESSAGE}""",
                 def log = "Pipeline completed successfully!\n"
                 writeFile file: "${LOG_FILE}", text: log, append: true
                 echo log
+                archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
                 mail to: 'vidulattri2003@gmail.com',
                      subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
                      body: """The pipeline ${env.JOB_NAME} completed successfully.
@@ -155,6 +158,7 @@ ${COMMIT_MESSAGE}""",
                 def log = "Pipeline failed!\n"
                 writeFile file: "${LOG_FILE}", text: log, append: true
                 echo log
+                archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
                 mail to: 'vidulattri2003@gmail.com',
                      subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                      body: """The pipeline ${env.JOB_NAME} has failed.
