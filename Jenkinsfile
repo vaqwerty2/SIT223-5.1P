@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         COMMIT_MESSAGE = '' // Variable to store the commit message
-        LOG_FILE = 'pipeline_log.txt' // Log file to store logs
+        LOG_FILE = 'pipeline_log.txt' // Log file to store log
     }
 
     stages {
