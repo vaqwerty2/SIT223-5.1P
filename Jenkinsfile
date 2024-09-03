@@ -32,9 +32,10 @@ pipeline {
         stage('Unit and Integration Tests') {
             steps {
                 script {
-                    def log = "Running Unit and Integration Tests...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Running Unit and Integration Tests...\n"
                     log += 'Using a test automation tool like JUnit for unit tests and TestNG for integration tests.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'mvn test'
                 }
@@ -43,9 +44,10 @@ pipeline {
         stage('Code Analysis') {
             steps {
                 script {
-                    def log = "Performing Code Analysis...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Performing Code Analysis...\n"
                     log += 'Using a basic tool like Checkstyle or PMD to analyze the code quality.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'checkstyle -c /google_checks.xml MyClass.java'
                 }
@@ -54,9 +56,10 @@ pipeline {
         stage('Security Scan') {
             steps {
                 script {
-                    def log = "Running Security Scan...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Running Security Scan...\n"
                     log += 'Using a basic tool like OWASP Dependency Check to identify vulnerabilities.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'dependency-check --project MyApp --scan .'
                 }
@@ -65,9 +68,10 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 script {
-                    def log = "Deploying the application to the Staging environment...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Deploying the application to the Staging environment...\n"
                     log += 'Deploying using a script or tool like SCP to transfer files to a staging server.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'scp target/myapp.jar user@staging_server:/path/to/deploy/'
                     // Example: sh 'ssh user@staging_server "bash /path/to/deploy.sh"'
@@ -77,9 +81,10 @@ pipeline {
         stage('Integration Tests on Staging') {
             steps {
                 script {
-                    def log = "Running Integration Tests on the Staging environment...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Running Integration Tests on the Staging environment...\n"
                     log += 'Using the same tools as the unit and integration test stage to validate the deployment.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'ssh user@staging_server "bash /path/to/tests/integration_tests.sh"'
                 }
@@ -88,9 +93,10 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 script {
-                    def log = "Deploying the application to the Production environment...\n"
+                    def log = readFile(file: "${LOG_FILE}")
+                    log += "Deploying the application to the Production environment...\n"
                     log += 'Deploying using a script or tool like SCP to transfer files to a production server.\n'
-                    writeFile file: "${LOG_FILE}", text: log, append: true
+                    writeFile file: "${LOG_FILE}", text: log
                     echo log
                     // Example: sh 'scp target/myapp.jar user@production_server:/path/to/deploy/'
                     // Example: sh 'ssh user@production_server "bash /path/to/deploy.sh"'
