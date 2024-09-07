@@ -58,6 +58,18 @@ pipeline {
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
                 }
+                post {
+                success {
+                    echo 'Security scan passed successfully!'
+                    mail to: 'vidulattri2003@gmail.com',
+                         subject: "Security Scan Passed - Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                         body: """The security scan in pipeline ${env.JOB_NAME} completed successfully.
+
+Check the results here: ${env.BUILD_URL}
+
+Commit Message:
+${COMMIT_MESSAGE}"""
+                }
             }
         }
         stage('Deploy to Staging') {
