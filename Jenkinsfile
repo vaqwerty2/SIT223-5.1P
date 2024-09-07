@@ -126,6 +126,7 @@ ${COMMIT_MESSAGE}
 
 Check the attached console log.""",
                 attachLog: true
+                attachmentsPattern: "${LOG_FILE}" // This attaches the log file
             )
         }
         failure {
@@ -141,6 +142,7 @@ ${COMMIT_MESSAGE}
 
 Check the attached console log.""",
                 attachLog: true
+                attachmentsPattern: "${LOG_FILE}" // This attaches the log file
             )
         }
     }
