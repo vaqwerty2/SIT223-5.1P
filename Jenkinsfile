@@ -58,7 +58,8 @@ pipeline {
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
                 }
-                post {
+            }
+            post {
                 success {
                     echo 'Security scan passed successfully!'
                     mail to: 'vidulattri2003@gmail.com',
@@ -133,6 +134,8 @@ Check the attached console log.""",
                 subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                 body: """The pipeline ${env.JOB_NAME} has failed.
 
+Check the results here: ${env.BUILD_URL}
+
 Commit Message:
 ${COMMIT_MESSAGE}
 
@@ -141,5 +144,4 @@ Check the attached console log.""",
             )
         }
     }
-}
 }
