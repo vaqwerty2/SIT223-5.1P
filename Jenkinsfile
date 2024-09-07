@@ -4,7 +4,6 @@ pipeline {
     environment {
         COMMIT_MESSAGE = '' // Variable to store the commit message
         LOG_FILE = 'pipeline_log.txt' // Log file to store logs
-        CONSOLE_LOG = 'console_output.txt' // File to store the console output
     }
 
     stages {
@@ -99,39 +98,35 @@ pipeline {
     post {
         always {
             script {
-                // Capture full console output in a sandbox-friendly way
-                def consoleOutput = sh(script: "cat ${env.WORKSPACE}/pipeline.log", returnStdout: true).trim()
-                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
-
                 // Archive artifacts
-                archiveArtifacts artifacts: "${LOG_FILE}, ${CONSOLE_LOG}", allowEmptyArchive: true
+                archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
             }
         }
         success {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
-                         body: """The pipeline ${env.JOB_NAME} completed successfully.
+            emailext (
+                to: "vidulattri2003@gmail.com",
+                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
+                body: """The pipeline ${env.JOB_NAME} completed successfully.
 
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the full console output and log file in the attached files.""",
-                         attachmentsPattern: "${CONSOLE_LOG}, ${LOG_FILE}"
-            }
+Check the attached console log.""",
+                attachLog: true
+            )
         }
         failure {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
-                         body: """The pipeline ${env.JOB_NAME} failed.
+            emailext (
+                to: "vidulattri2003@gmail.com",
+                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
+                body: """The pipeline ${env.JOB_NAME} has failed.
 
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the full console output and log file in the attached files.""",
-                         attachmentsPattern: "${CONSOLE_LOG}, ${LOG_FILE}"
-            }
+Check the attached console log.""",
+                attachLog: true
+            )
         }
     }
 }
@@ -140,30 +135,30 @@ Check the full console output and log file in the attached files.""",
 post {
     stage('Security Scan') {
         success {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
+            emailext (
+                to: "vidulattri2003@gmail.com",
+                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
+                body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
 
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the full console output and log file in the attached files.""",
-                         attachmentsPattern: "${CONSOLE_LOG}, ${LOG_FILE}"
-            }
+Check the attached console log.""",
+                attachLog: true
+            )
         }
         failure {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} failed.
+            emailext (
+                to: "vidulattri2003@gmail.com",
+                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
+                body: """The Security Scan for pipeline ${env.JOB_NAME} has failed.
 
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the full console output and log file in the attached files.""",
-                         attachmentsPattern: "${CONSOLE_LOG}, ${LOG_FILE}"
-            }
+Check the attached console log.""",
+                attachLog: true
+            )
         }
     }
 }
