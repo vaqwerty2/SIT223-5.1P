@@ -114,6 +114,8 @@ pipeline {
         }
         success {
             script {
+                // Capture console output and send via email
+                def consoleOutput = currentBuild.rawBuild.getLog(1000).join("\n")
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
                          body: """The pipeline ${env.JOB_NAME} completed successfully.
@@ -121,12 +123,16 @@ pipeline {
 Check the results here: ${env.BUILD_URL}
 
 Commit Message:
-${COMMIT_MESSAGE}""",
-                         attachmentsPattern: "${LOG_FILE}"
+${COMMIT_MESSAGE}
+
+Console Output:
+${consoleOutput}"""
             }
         }
         failure {
             script {
+                // Capture console output and send via email
+                def consoleOutput = currentBuild.rawBuild.getLog(1000).join("\n")
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                          body: """The pipeline ${env.JOB_NAME} has failed.
@@ -134,8 +140,40 @@ ${COMMIT_MESSAGE}""",
 Check the details here: ${env.BUILD_URL}
 
 Commit Message:
-${COMMIT_MESSAGE}""",
-                         attachmentsPattern: "${LOG_FILE}"
+${COMMIT_MESSAGE}
+
+Console Output:
+${consoleOutput}"""
+            }
+        }
+    }
+}
+
+// Separate post action for sending email after Security Scan stage
+post {
+    stage('Security Scan') {
+        success {
+            script {
+                emailext to: 'vidulattri2003@gmail.com',
+                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
+                         body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
+
+Check the results here: ${env.BUILD_URL}
+
+Commit Message:
+${COMMIT_MESSAGE}"""
+            }
+        }
+        failure {
+            script {
+                emailext to: 'vidulattri2003@gmail.com',
+                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
+                         body: """The Security Scan for pipeline ${env.JOB_NAME} has failed.
+
+Check the details here: ${env.BUILD_URL}
+
+Commit Message:
+${COMMIT_MESSAGE}"""
             }
         }
     }
