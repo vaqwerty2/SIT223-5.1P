@@ -98,7 +98,7 @@ pipeline {
     post {
         always {
             script {
-                // Archive artifacts
+                // Archive the log file
                 archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
             }
         }
@@ -120,38 +120,6 @@ Check the attached console log.""",
                 to: "vidulattri2003@gmail.com",
                 subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                 body: """The pipeline ${env.JOB_NAME} has failed.
-
-Commit Message:
-${COMMIT_MESSAGE}
-
-Check the attached console log.""",
-                attachLog: true
-            )
-        }
-    }
-}
-
-// Post action for email notification after Security Scan stage
-post {
-    stage('Security Scan') {
-        success {
-            emailext (
-                to: "vidulattri2003@gmail.com",
-                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
-                body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
-
-Commit Message:
-${COMMIT_MESSAGE}
-
-Check the attached console log.""",
-                attachLog: true
-            )
-        }
-        failure {
-            emailext (
-                to: "vidulattri2003@gmail.com",
-                subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
-                body: """The Security Scan for pipeline ${env.JOB_NAME} has failed.
 
 Commit Message:
 ${COMMIT_MESSAGE}
