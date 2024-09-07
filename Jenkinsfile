@@ -4,7 +4,7 @@ pipeline {
     environment {
         COMMIT_MESSAGE = '' // Variable to store the commit message
         LOG_FILE = 'pipeline_log.txt' // Log file to store logs
-        CONSOLE_LOG = 'console_output.txt' // File to store the full console output
+        CONSOLE_LOG = 'console_output.txt' // File to store the console output
     }
 
     stages {
@@ -99,8 +99,8 @@ pipeline {
     post {
         always {
             script {
-                // Capture full console output to a file
-                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
+                // Capture console output within sandbox
+                def consoleOutput = sh(script: 'cat $BUILD_LOG', returnStdout: true).trim()
                 writeFile file: "${CONSOLE_LOG}", text: consoleOutput
 
                 // Archive the console output and the log file
@@ -141,10 +141,6 @@ post {
     stage('Security Scan') {
         success {
             script {
-                // Capture full console output to a file
-                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
-                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
-
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
                          body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
@@ -158,10 +154,6 @@ Check the full console output in the attached file.""",
         }
         failure {
             script {
-                // Capture full console output to a file
-                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
-                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
-
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
                          body: """The Security Scan for pipeline ${env.JOB_NAME} failed.
