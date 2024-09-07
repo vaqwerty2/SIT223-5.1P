@@ -111,8 +111,9 @@ pipeline {
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the attached console log.""",
-                attachLog: true
+Check the attached console log and the log file.""",
+                attachLog: true, // This attaches the console log
+                attachmentsPattern: "${LOG_FILE}" // This attaches the log file
             )
         }
         failure {
@@ -124,9 +125,27 @@ Check the attached console log.""",
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the attached console log.""",
-                attachLog: true
+Check the attached console log and the log file.""",
+                attachLog: true, // This attaches the console log
+                attachmentsPattern: "${LOG_FILE}" // This attaches the log file
             )
+        }
+        // Email after Security Scan passes
+        success {
+            stage('Security Scan') {
+                emailext (
+                    to: "vidulattri2003@gmail.com",
+                    subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
+                    body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
+
+Commit Message:
+${COMMIT_MESSAGE}
+
+Check the attached console log and the log file.""",
+                    attachLog: true, // This attaches the console log
+                    attachmentsPattern: "${LOG_FILE}" // This attaches the log file
+                )
+            }
         }
     }
 }
