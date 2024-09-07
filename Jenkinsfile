@@ -10,9 +10,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Ensure SCM checkout and then fetch the latest commit message
-                    def scmVars = checkout scm
-                    // Fetch the latest commit message
+                    // Checkout and fetch the latest commit message
+                    checkout scm
                     COMMIT_MESSAGE = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
                     echo "Commit Message: ${COMMIT_MESSAGE}"
                 }
@@ -22,10 +21,10 @@ pipeline {
             steps {
                 script {
                     def log = "Building the application...\n"
-                    log += 'Using a build automation tool like Maven or Gradle to compile and package the code.\n'
+                    log += 'Using a build automation tool like Maven or Gradle to compile and package the code (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'mvn clean package'
+                    // Mock command: sh 'mvn clean package'
                 }
             }
         }
@@ -33,11 +32,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Running Unit and Integration Tests...\n"
-                    log += 'Using a test automation tool like JUnit for unit tests and TestNG for integration tests.\n'
+                    log += "Running Unit and Integration Tests (Mock)...\n"
+                    log += 'Using JUnit/TestNG (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'mvn test'
+                    // Mock command: sh 'mvn test'
                 }
             }
         }
@@ -45,11 +44,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Performing Code Analysis...\n"
-                    log += 'Using a basic tool like Checkstyle or PMD to analyze the code quality.\n'
+                    log += "Performing Code Analysis (Mock)...\n"
+                    log += 'Using Checkstyle/PMD (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'checkstyle -c /google_checks.xml MyClass.java'
+                    // Mock command: sh 'checkstyle -c /google_checks.xml MyClass.java'
                 }
             }
         }
@@ -57,11 +56,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Running Security Scan...\n"
-                    log += 'Using a basic tool like OWASP Dependency Check to identify vulnerabilities.\n'
+                    log += "Running Security Scan (Mock)...\n"
+                    log += 'Using OWASP Dependency Check (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'dependency-check --project MyApp --scan .'
+                    // Mock command: sh 'dependency-check --project MyApp --scan .'
                 }
             }
         }
@@ -69,12 +68,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Deploying the application to the Staging environment...\n"
-                    log += 'Deploying using a script or tool like SCP to transfer files to a staging server.\n'
+                    log += "Deploying the application to the Staging environment (Mock)...\n"
+                    log += 'Using SCP or a similar tool (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'scp target/myapp.jar user@staging_server:/path/to/deploy/'
-                    // Example: sh 'ssh user@staging_server "bash /path/to/deploy.sh"'
+                    // Mock command: sh 'scp target/myapp.jar user@staging_server:/path/to/deploy/'
                 }
             }
         }
@@ -82,11 +80,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Running Integration Tests on the Staging environment...\n"
-                    log += 'Using the same tools as the unit and integration test stage to validate the deployment.\n'
+                    log += "Running Integration Tests on the Staging environment (Mock)...\n"
+                    log += 'Using JUnit/TestNG (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'ssh user@staging_server "bash /path/to/tests/integration_tests.sh"'
+                    // Mock command: sh 'ssh user@staging_server "bash /path/to/tests/integration_tests.sh"'
                 }
             }
         }
@@ -94,12 +92,11 @@ pipeline {
             steps {
                 script {
                     def log = readFile(file: "${LOG_FILE}")
-                    log += "Deploying the application to the Production environment...\n"
-                    log += 'Deploying using a script or tool like SCP to transfer files to a production server.\n'
+                    log += "Deploying the application to the Production environment (Mock)...\n"
+                    log += 'Using SCP or a similar tool (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Example: sh 'scp target/myapp.jar user@production_server:/path/to/deploy/'
-                    // Example: sh 'ssh user@production_server "bash /path/to/deploy.sh"'
+                    // Mock command: sh 'scp target/myapp.jar user@production_server:/path/to/deploy/'
                 }
             }
         }
@@ -108,72 +105,34 @@ pipeline {
     post {
         always {
             script {
-                // Ensure the log file is archived so it can be attached to the email
+                // Archive the log file
                 archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
             }
         }
         success {
             script {
-                // Capture console output and send via email
-                def consoleOutput = currentBuild.rawBuild.getLog(1000).join("\n")
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
                          body: """The pipeline ${env.JOB_NAME} completed successfully.
 
-Check the results here: ${env.BUILD_URL}
-
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Console Output:
-${consoleOutput}"""
+Check the log file here: ${env.BUILD_URL}""",
+                         attachmentsPattern: "${LOG_FILE}"
             }
         }
         failure {
             script {
-                // Capture console output and send via email
-                def consoleOutput = currentBuild.rawBuild.getLog(1000).join("\n")
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
-                         body: """The pipeline ${env.JOB_NAME} has failed.
-
-Check the details here: ${env.BUILD_URL}
+                         body: """The pipeline ${env.JOB_NAME} failed.
 
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Console Output:
-${consoleOutput}"""
-            }
-        }
-    }
-}
-
-// Separate post action for sending email after Security Scan stage
-post {
-    stage('Security Scan') {
-        success {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
-
-Check the results here: ${env.BUILD_URL}
-
-Commit Message:
-${COMMIT_MESSAGE}"""
-            }
-        }
-        failure {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} has failed.
-
-Check the details here: ${env.BUILD_URL}
-
-Commit Message:
-${COMMIT_MESSAGE}"""
+Check the log file here: ${env.BUILD_URL}""",
+                         attachmentsPattern: "${LOG_FILE}"
             }
         }
     }
