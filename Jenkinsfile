@@ -121,6 +121,8 @@ ${COMMIT_MESSAGE}"""
                 subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Success",
                 body: """The pipeline ${env.JOB_NAME} completed successfully.
 
+Check the results here: ${env.BUILD_URL}
+
 Commit Message:
 ${COMMIT_MESSAGE}
 
