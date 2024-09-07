@@ -4,6 +4,7 @@ pipeline {
     environment {
         COMMIT_MESSAGE = '' // Variable to store the commit message
         LOG_FILE = 'pipeline_log.txt' // Log file to store logs
+        CONSOLE_LOG = 'console_output.txt' // File to store the full console output
     }
 
     stages {
@@ -24,7 +25,6 @@ pipeline {
                     log += 'Using a build automation tool like Maven or Gradle to compile and package the code (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'mvn clean package'
                 }
             }
         }
@@ -36,7 +36,6 @@ pipeline {
                     log += 'Using JUnit/TestNG (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'mvn test'
                 }
             }
         }
@@ -48,7 +47,6 @@ pipeline {
                     log += 'Using Checkstyle/PMD (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'checkstyle -c /google_checks.xml MyClass.java'
                 }
             }
         }
@@ -60,7 +58,6 @@ pipeline {
                     log += 'Using OWASP Dependency Check (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'dependency-check --project MyApp --scan .'
                 }
             }
         }
@@ -72,7 +69,6 @@ pipeline {
                     log += 'Using SCP or a similar tool (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'scp target/myapp.jar user@staging_server:/path/to/deploy/'
                 }
             }
         }
@@ -84,7 +80,6 @@ pipeline {
                     log += 'Using JUnit/TestNG (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'ssh user@staging_server "bash /path/to/tests/integration_tests.sh"'
                 }
             }
         }
@@ -96,7 +91,6 @@ pipeline {
                     log += 'Using SCP or a similar tool (Mock).\n'
                     writeFile file: "${LOG_FILE}", text: log
                     echo log
-                    // Mock command: sh 'scp target/myapp.jar user@production_server:/path/to/deploy/'
                 }
             }
         }
@@ -105,8 +99,12 @@ pipeline {
     post {
         always {
             script {
-                // Archive the log file
-                archiveArtifacts artifacts: "${LOG_FILE}", allowEmptyArchive: true
+                // Capture full console output to a file
+                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
+                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
+
+                // Archive the console output and the log file
+                archiveArtifacts artifacts: "${LOG_FILE}, ${CONSOLE_LOG}", allowEmptyArchive: true
             }
         }
         success {
@@ -118,8 +116,8 @@ pipeline {
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the log file here: ${env.BUILD_URL}""",
-                         attachmentsPattern: "${LOG_FILE}"
+Check the full console output in the attached file.""",
+                         attachmentsPattern: "${CONSOLE_LOG}"
             }
         }
         failure {
@@ -131,8 +129,48 @@ Check the log file here: ${env.BUILD_URL}""",
 Commit Message:
 ${COMMIT_MESSAGE}
 
-Check the log file here: ${env.BUILD_URL}""",
-                         attachmentsPattern: "${LOG_FILE}"
+Check the full console output in the attached file.""",
+                         attachmentsPattern: "${CONSOLE_LOG}"
+            }
+        }
+    }
+}
+
+// Post action for email notification after Security Scan stage
+post {
+    stage('Security Scan') {
+        success {
+            script {
+                // Capture full console output to a file
+                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
+                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
+
+                emailext to: 'vidulattri2003@gmail.com',
+                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
+                         body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
+
+Commit Message:
+${COMMIT_MESSAGE}
+
+Check the full console output in the attached file.""",
+                         attachmentsPattern: "${CONSOLE_LOG}"
+            }
+        }
+        failure {
+            script {
+                // Capture full console output to a file
+                def consoleOutput = currentBuild.getRawBuild().getLog(1000).join("\n")
+                writeFile file: "${CONSOLE_LOG}", text: consoleOutput
+
+                emailext to: 'vidulattri2003@gmail.com',
+                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
+                         body: """The Security Scan for pipeline ${env.JOB_NAME} failed.
+
+Commit Message:
+${COMMIT_MESSAGE}
+
+Check the full console output in the attached file.""",
+                         attachmentsPattern: "${CONSOLE_LOG}"
             }
         }
     }
