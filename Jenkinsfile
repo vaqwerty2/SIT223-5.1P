@@ -60,6 +60,22 @@ pipeline {
                 }
             }
         }
+        post {
+            success {
+                emailext (
+                    to: "vidulattri2003@gmail.com",
+                    subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
+                    body: """The pipeline ${env.JOB_NAME} has passed the Security Scan.
+
+Commit Message:
+${COMMIT_MESSAGE}
+
+Check the attached console log.""",
+                    attachLog: true
+                )
+            }
+        }
+
         stage('Deploy to Staging') {
             steps {
                 script {
