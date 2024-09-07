@@ -99,11 +99,11 @@ pipeline {
     post {
         always {
             script {
-                // Capture console output within sandbox
-                def consoleOutput = sh(script: 'cat $BUILD_LOG', returnStdout: true).trim()
+                // Capture full console output in a sandbox-friendly way
+                def consoleOutput = sh(script: "cat ${env.WORKSPACE}/pipeline.log", returnStdout: true).trim()
                 writeFile file: "${CONSOLE_LOG}", text: consoleOutput
 
-                // Archive the console output and the log file
+                // Archive artifacts
                 archiveArtifacts artifacts: "${LOG_FILE}, ${CONSOLE_LOG}", allowEmptyArchive: true
             }
         }
@@ -125,38 +125,6 @@ Check the full console output in the attached file.""",
                 emailext to: 'vidulattri2003@gmail.com',
                          subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Failed",
                          body: """The pipeline ${env.JOB_NAME} failed.
-
-Commit Message:
-${COMMIT_MESSAGE}
-
-Check the full console output in the attached file.""",
-                         attachmentsPattern: "${CONSOLE_LOG}"
-            }
-        }
-    }
-}
-
-// Post action for email notification after Security Scan stage
-post {
-    stage('Security Scan') {
-        success {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Passed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} completed successfully.
-
-Commit Message:
-${COMMIT_MESSAGE}
-
-Check the full console output in the attached file.""",
-                         attachmentsPattern: "${CONSOLE_LOG}"
-            }
-        }
-        failure {
-            script {
-                emailext to: 'vidulattri2003@gmail.com',
-                         subject: "Pipeline ${env.JOB_NAME} - ${env.BUILD_NUMBER} Security Scan Failed",
-                         body: """The Security Scan for pipeline ${env.JOB_NAME} failed.
 
 Commit Message:
 ${COMMIT_MESSAGE}
